@@ -1,0 +1,15 @@
+# Build output
+SchoolManagementSystem/target/
+SchoolManagementSystem/nbproject/private/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log

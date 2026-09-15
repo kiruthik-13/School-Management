@@ -1,0 +1,35 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<div class="col-lg-2 col-md-3 d-md-block bg-dark sidebar p-3">
+    <ul class="nav flex-column">
+        <c:choose>
+            <c:when test="${user.role == 'ADMIN'}">
+                <li class="nav-item"><a class="nav-link ${active == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/admin"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'admission' ? 'active' : ''}" href="${pageContext.request.contextPath}/admin/student-form.jsp"><i class="bi bi-person-plus"></i> New Admission</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'students' ? 'active' : ''}" href="${pageContext.request.contextPath}/students"><i class="bi bi-people"></i> Students</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'teachers' ? 'active' : ''}" href="${pageContext.request.contextPath}/teachers"><i class="bi bi-person-workspace"></i> Teachers</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'subjects' ? 'active' : ''}" href="${pageContext.request.contextPath}/subjects"><i class="bi bi-journal-bookmark"></i> Class & Subjects</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'attendance' ? 'active' : ''}" href="${pageContext.request.contextPath}/attendance"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'exams' ? 'active' : ''}" href="${pageContext.request.contextPath}/exams"><i class="bi bi-pencil-square"></i> Exams</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'marks' ? 'active' : ''}" href="${pageContext.request.contextPath}/marks"><i class="bi bi-clipboard-data"></i> Enter Marks</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'fees' ? 'active' : ''}" href="${pageContext.request.contextPath}/fees"><i class="bi bi-cash-coin"></i> Fee Structure</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'payments' ? 'active' : ''}" href="${pageContext.request.contextPath}/payments"><i class="bi bi-receipt"></i> Fee Payments</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'transport' ? 'active' : ''}" href="${pageContext.request.contextPath}/transport"><i class="bi bi-bus-front"></i> Transport</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'reports' ? 'active' : ''}" href="${pageContext.request.contextPath}/reports"><i class="bi bi-bar-chart"></i> Reports</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'messages' ? 'active' : ''}" href="${pageContext.request.contextPath}/messages"><i class="bi bi-envelope"></i> Messages</a></li>
+            </c:when>
+            <c:when test="${user.role == 'TEACHER'}">
+                <li class="nav-item"><a class="nav-link ${active == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/teacher"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'attendance' ? 'active' : ''}" href="${pageContext.request.contextPath}/attendance"><i class="bi bi-calendar-check"></i> Mark Attendance</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'marks' ? 'active' : ''}" href="${pageContext.request.contextPath}/marks"><i class="bi bi-clipboard-data"></i> Enter Marks</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'messages' ? 'active' : ''}" href="${pageContext.request.contextPath}/messages"><i class="bi bi-envelope"></i> Messages</a></li>
+            </c:when>
+            <c:when test="${user.role == 'PARENT'}">
+                <li class="nav-item"><a class="nav-link ${active == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/parent"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/parent#attendance"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/parent#marks"><i class="bi bi-clipboard-data"></i> Marks</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/parent#fees"><i class="bi bi-cash-coin"></i> Fee Status</a></li>
+                <li class="nav-item"><a class="nav-link ${active == 'messages' ? 'active' : ''}" href="${pageContext.request.contextPath}/messages"><i class="bi bi-envelope"></i> Messages</a></li>
+            </c:when>
+        </c:choose>
+    </ul>
+</div>
