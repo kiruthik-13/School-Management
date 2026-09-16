@@ -1,0 +1,97 @@
+<%- include('../partials/head', { pageTitle: 'Parent Portal', active: 'dashboard' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<% if (message) { %>
+  <div class="card"><div class="card-body py-5 text-center">
+    <div class="empty-state"><i class="bi bi-person-x empty-icon"></i><div class="empty-title"><%= message %></div><div class="empty-sub">Contact the school office to link your account.</div></div>
+  </div></div>
+<% } else { %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)"><i class="bi bi-mortarboard"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= child ? child.fullName : '' %></h1>
+    <p class="page-head-sub"><%= child ? child.className + ' ' + (child.section || '') + ' &middot; Admission #' + child.admissionNo : '' %></p>
+  </div>
+  <% if (children.length > 1) { %>
+    <div class="page-head-actions">
+      <select class="form-select" onchange="location.href='/parent?child=' + this.value"><% children.forEach(function (c) { %><option value="<%= c.studentId %>" <%= child && Number(child.studentId) === Number(c.studentId) ? 'selected' : '' %>><%= c.fullName %></option><% }) %></select>
+    </div>
+  <% } %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon text-primary"><i class="bi bi-calendar-check"></i></div>
+      <div><div class="stat-value"><%= attendanceStats.present %>/<%= attendanceStats.total %></div><div class="stat-label">Days Present</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-graph-up"></i></div>
+      <div><div class="stat-value"><%= attendanceStats.percentage %>%</div><div class="stat-label">Attendance Rate</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#dc2626;background:rgba(220,38,38,.12)"><i class="bi bi-cash-stack"></i></div>
+      <div><div class="stat-value">Rs <%= dues.reduce(function (s, d) { return s + (d.remaining || 0); }, 0).toFixed(0) %></div><div class="stat-label">Fee Dues</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#0891b2;background:rgba(8,145,178,.12)"><i class="bi bi-bus-front"></i></div>
+      <div><div class="stat-value" style="font-size:1.1rem;word-break:break-word"><%= transport.routeName || 'Not assigned' %></div><div class="stat-label"><%= transport.vehicleNo ? transport.vehicleNo + ' / ' + (transport.driverName || '') : 'Transport route' %></div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-wallet2 me-2 text-danger"></i>Fee Dues</span></div>
+      <div class="card-body p-0">
+        <% if (!dues || !dues.length) { %>
+          <div class="empty-state"><i class="bi bi-check2-circle empty-icon"></i><div class="empty-title">All caught up!</div><div class="empty-sub">No outstanding fees.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Fee Type</th><th class="text-end">Amount</th><th class="text-end">Paid</th><th class="text-end">Due</th><th>Status</th></tr></thead><tbody><% (dues || []).forEach(function (d) { %><tr>
+          <td class="fw-semibold"><%= d.feeType %></td>
+          <td class="text-end">Rs <%= Number(d.amount).toFixed(2) %></td>
+          <td class="text-end">Rs <%= Number(d.paid).toFixed(2) %></td>
+          <td class="text-end"><strong class="<%= d.remaining > 0 ? 'text-danger' : '' %>"><%= d.remaining > 0 ? 'Rs ' + Number(d.remaining).toFixed(2) : '-' %></strong></td>
+          <td><span class="badge text-bg-<%= d.status === 'PAID' ? 'success' : d.status === 'PARTIAL' ? 'warning' : 'danger' %>"><%= d.status %></span></td>
+        </tr><% }) %></tbody></table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-heart-pulse me-2 text-success"></i>Recent Attendance</span></div>
+      <div class="card-body p-0">
+        <% if (!recentAttendance || !recentAttendance.length) { %>
+          <div class="empty-state"><i class="bi bi-calendar-x empty-icon"></i><div class="empty-title">No records yet</div><div class="empty-sub">Attendance will show here once marked.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Date</th><th class="text-end">Status</th></tr></thead><tbody><% (recentAttendance || []).slice(0, 10).forEach(function (r) { %><tr>
+          <td><%= r.attendanceDate %></td><td class="text-end"><span class="badge text-bg-<%= r.status === 'PRESENT' ? 'success' : r.status === 'ABSENT' ? 'danger' : 'secondary' %>"><i class="bi bi-<%= r.status === 'PRESENT' ? 'check-lg' : r.status === 'ABSENT' ? 'x-lg' : 'dash-lg' %> me-1"></i><%= r.status %></span></td>
+        </tr><% }) %></tbody></table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4"><div class="card-header"><span class="header-title"><i class="bi bi-award me-2 text-primary"></i>Exam Marks</span></div>
+  <div class="card-body p-0">
+    <% if (!marks || !marks.length) { %>
+      <div class="empty-state"><i class="bi bi-journal-x empty-icon"></i><div class="empty-title">No marks yet</div><div class="empty-sub">Results will appear once exams are graded.</div></div>
+    <% } else { %>
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Exam</th><th>Subject</th><th class="text-end">Marks</th><th class="text-end">Max</th><th class="text-end">Grade</th></tr></thead><tbody><% (marks || []).forEach(function (m) { %><tr>
+      <td><strong><%= m.examName %></strong><br><small class="text-muted"><%= m.examDate || '' %></small></td>
+      <td><%= m.subjectName %></td>
+      <td class="text-end"><strong><%= m.marksObtained %></strong> / <%= m.maxMarks %></td>
+      <td class="text-end"><%= m.maxMarks %></td>
+      <td class="text-end"><span class="badge text-bg-<%= (m.grade || 'F') === 'F' ? 'danger' : (m.grade || '').startsWith('A') ? 'success' : 'info' %>"><%= m.grade %></span></td>
+    </tr><% }) %></tbody></table></div>
+    <% } %>
+  </div>
+</div>
+<% } %>
+<%- include('../partials/footer') %>

@@ -73,7 +73,7 @@ counts.push(${row.count});
 </c:forEach>
 new Chart(document.getElementById('classChart'), {
     type: 'bar',
-    data: { labels, datasets: [{ label: 'Students', data: counts, backgroundColor: '#0d6efd' }] },
+    data: { labels, datasets: [{ label: 'Students', data: counts, backgroundColor: '#4f46e5' }] },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
 });
 </script>

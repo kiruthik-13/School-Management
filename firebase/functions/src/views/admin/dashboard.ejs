@@ -1,0 +1,89 @@
+<%- include('../partials/head', { pageTitle: 'Admin Dashboard', active: 'dashboard' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon"><i class="bi bi-speedometer2"></i></div>
+  <div>
+    <h1 class="page-head-title">Admin Dashboard</h1>
+    <p class="page-head-sub">School overview at a glance</p>
+  </div>
+  <div class="page-head-actions">
+    <a href="/reports" class="btn btn-outline-secondary"><i class="bi bi-bar-chart me-1"></i> Reports</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon text-primary"><i class="bi bi-people"></i></div>
+      <div><div class="stat-value"><%= studentCount %></div><div class="stat-label">Active Students</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#0891b2;background:rgba(8,145,178,.12)"><i class="bi bi-person-video3"></i></div>
+      <div><div class="stat-value"><%= teacherCount %></div><div class="stat-label">Teachers</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-check-circle"></i></div>
+      <div><div class="stat-value"><%= presentToday %></div><div class="stat-label">Present Today</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#dc2626;background:rgba(220,38,38,.12)"><i class="bi bi-x-circle"></i></div>
+      <div><div class="stat-value"><%= absentToday %></div><div class="stat-label">Absent Today</div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card h-100"><div class="card-header d-flex align-items-center justify-content-between">
+        <span class="header-title"><i class="bi bi-diagram-3 me-2 text-primary"></i>Class-Wise Student Count</span>
+        <span class="badge text-bg-primary"><%= studentCount %> enrolled</span>
+      </div>
+      <div class="card-body">
+        <% var maxCount = Math.max.apply(null, (classCounts || []).map(function (c) { return c.count; }).concat([1])); %>
+        <% if (!classCounts || !classCounts.length) { %>
+          <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No students yet</div><div class="empty-sub">Add students to see the class breakdown.</div></div>
+        <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Class</th><th>Section</th><th class="w-50">Enrollment</th><th class="text-end">Students</th></tr></thead>
+            <tbody><% (classCounts || []).forEach(function (r) { %><tr>
+              <td class="fw-semibold"><%= r.className %></td>
+              <td><%= r.section || '-' %></td>
+              <td><div class="progress" style="height:8px"><div class="progress-bar" style="width:<%= Math.round((r.count / maxCount) * 100) %>%"></div></div></td>
+              <td class="text-end fw-bold"><%= r.count %></td>
+            </tr><% }) %></tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100"><div class="card-header">
+        <span class="header-title"><i class="bi bi-lightning-charge me-2 text-primary"></i>Quick Actions</span>
+      </div>
+      <div class="card-body d-grid gap-2">
+        <a class="quick-action" href="/student/form"><div class="d-flex align-items-center gap-3"><div class="qa-icon"><i class="bi bi-person-plus"></i></div><div><div class="qa-title">Add Student</div><div class="qa-sub">Admit a new student</div></div></div></a>
+        <a class="quick-action" href="/attendance"><div class="d-flex align-items-center gap-3"><div class="qa-icon"><i class="bi bi-calendar-check"></i></div><div><div class="qa-title">Mark Attendance</div><div class="qa-sub">Record today's presence</div></div></div></a>
+        <a class="quick-action" href="/marks"><div class="d-flex align-items-center gap-3"><div class="qa-icon"><i class="bi bi-pencil-square"></i></div><div><div class="qa-title">Enter Marks</div><div class="qa-sub">Fill exam results</div></div></div></a>
+        <a class="quick-action" href="/fees/payments"><div class="d-flex align-items-center gap-3"><div class="qa-icon"><i class="bi bi-cash-coin"></i></div><div><div class="qa-title">Record Payment</div><div class="qa-sub">Log a fee collection</div></div></div></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4"><div class="card-header">
+    <span class="header-title"><i class="bi bi-cash-stack me-2 text-success"></i>Fees Collected</span>
+  </div>
+  <div class="card-body d-flex align-items-center gap-3 py-4">
+    <div class="stat-icon rounded-3" style="width:52px;height:52px;font-size:1.4rem;color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-graph-up-arrow"></i></div>
+    <div><div class="stat-value">Rs <%= Number(feeCollected || 0).toLocaleString() %></div><div class="stat-label">Total collected across all fees</div></div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

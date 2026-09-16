@@ -1,0 +1,70 @@
+<%- include('partials/head', { pageTitle: 'Forgot Username', active: '' }) %>
+  <section class="auth-split">
+    <div class="auth-brand">
+      <div class="auth-blob blob-1"></div>
+      <div class="auth-blob blob-2"></div>
+      <div class="auth-blob blob-3"></div>
+      <div class="auth-brand-top">
+        <div class="auth-brand-logo"><i class="bi bi-mortarboard-fill"></i></div>
+        <span class="auth-brand-name">SM</span>
+      </div>
+      <div class="auth-brand-body">
+        <h1>Run your school,<br>beautifully.</h1>
+        <p>Students, teachers, marks, fees, attendance and transport — everything in one modern workspace.</p>
+        <ul class="auth-features">
+          <li><span class="fi"><i class="bi bi-clipboard-check"></i></span> Live report cards &amp; exam analysis</li>
+          <li><span class="fi"><i class="bi bi-calendar-check"></i></span> Attendance &amp; fee tracking</li>
+          <li><span class="fi"><i class="bi bi-chat-dots"></i></span> Parent–teacher messaging</li>
+        </ul>
+      </div>
+      <div class="auth-brand-stats">
+        <div class="st"><b>1200+</b><span>Students</span></div>
+        <div class="st"><b>98.4%</b><span>Attendance</span></div>
+        <div class="st"><b>A+</b><span>Top grade</span></div>
+      </div>
+      <div class="auth-brand-foot">&copy; 2026 SM System</div>
+    </div>
+    <div class="auth-form">
+      <div class="auth-card-new">
+        <div class="text-center">
+          <div class="auth-icon mx-auto"><i class="bi bi-search"></i></div>
+          <h2>Find your username</h2>
+          <p class="sub">Enter the email registered with your account</p>
+        </div>
+        <form method="post" action="/forgot-username">
+          <div class="mb-4 auth-input-group">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" class="form-control" name="email" placeholder="name@example.com" value="<%= searched || '' %>" required autofocus>
+          </div>
+          <button class="btn auth-submit" type="submit"><i class="bi bi-search me-2"></i>Look up Username</button>
+        </form>
+        <% if (searched !== null) { %>
+          <hr class="my-4">
+          <% if (!matches || !matches.length) { %>
+            <div class="text-center">
+              <div class="fs-1 text-muted mb-2"><i class="bi bi-x-circle"></i></div>
+              <p class="fw-semibold mb-1">No account found</p>
+              <p class="text-muted small mb-0">No users match "<%= searched %>". Check the email and try again.</p>
+            </div>
+          <% } else { %>
+            <div class="mb-3 small fw-semibold text-muted">Accounts found:</div>
+            <% matches.forEach(function (m) { %>
+              <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-body-tertiary mb-2">
+                <div>
+                  <div class="fw-semibold"><i class="bi bi-person-circle me-2 text-primary"></i><%= m.username %></div>
+                  <div class="text-muted small ms-5"><%= m.fullName || '' %> <span class="badge bg-secondary bg-opacity-25 text-dark ms-1"><%= m.role %></span></div>
+                </div>
+              </div>
+            <% }) %>
+            <div class="text-muted small mt-2">Sign in using the username shown above.</div>
+          <% } %>
+        <% } %>
+        <div class="d-flex align-items-center justify-content-between mt-4">
+          <a class="auth-link" href="/login">Back to Sign in</a>
+          <a class="auth-link" href="/forgot-password">Forgot password?</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main></div></div>
+<%- include('partials/footer') %>

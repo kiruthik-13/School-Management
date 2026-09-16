@@ -1,0 +1,47 @@
+<%- include('../partials/head', { pageTitle: user ? 'Reset Password' : 'Add User', active: 'users' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"><i class="bi <%= user ? 'bi-key' : 'bi-person-plus' %>"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= user ? 'Reset Password' : 'Add User' %></h1>
+    <p class="page-head-sub"><%= user ? 'Set a new password for ' + user.username : 'Create a new login account' %></p>
+  </div>
+  <div class="page-head-actions"><a class="btn btn-outline-secondary" href="/users"><i class="bi bi-arrow-left me-1"></i> Back to Users</a></div>
+</div>
+
+<div class="card shadow-sm" style="max-width: 720px">
+  <div class="card-header"><span class="header-title"><i class="bi bi-shield-lock me-2 text-primary"></i><%= user ? 'New Credentials' : 'Account Details' %></span></div>
+  <div class="card-body">
+    <form method="post" action="<%= user ? '/user/reset' : '/user/save' %>">
+      <% if (user) { %>
+        <input type="hidden" name="userId" value="<%= user.userId %>">
+        <div class="mb-3">
+          <label class="form-label">Account</label>
+          <div class="d-flex align-items-center gap-3">
+            <div><span class="badge <%= user.role === 'ADMIN' ? 'text-bg-danger' : user.role === 'TEACHER' ? 'text-bg-info' : user.role === 'STUDENT' ? 'text-bg-primary' : 'text-bg-warning' %>"><%= user.role %></span></div>
+            <div class="fw-semibold"><code><%= user.username %></code></div>
+            <div class="text-muted"><%= user.fullName || '' %></div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Role</label><select class="form-select" name="role" required autofocus>
+            <% (ROLES || []).forEach(function (r) { %><option value="<%= r %>"><%= r === 'ADMIN' ? 'Administrator' : r === 'TEACHER' ? 'Teacher' : r === 'STUDENT' ? 'Student' : 'Parent' %></option><% }) %>
+          </select></div>
+          <div class="col-md-6"><label class="form-label">Username (login)</label><input class="form-control" name="username" placeholder="e.g. newparent" maxlength="20" required></div>
+          <div class="col-md-6"><label class="form-label">Full Name</label><input class="form-control" name="fullName" placeholder="e.g. Rajesh Kumar"></div>
+          <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" name="email" placeholder="name@school.edu"></div>
+        </div>
+      <% } %>
+      <div class="row g-3 mt-0">
+        <div class="col-md-6"><label class="form-label">New Password <span class="text-muted">(min 6 chars)</span></label><input type="password" class="form-control" name="password" required autocomplete="new-password"></div>
+        <div class="col-md-6"><label class="form-label">Confirm Password</label><input type="password" class="form-control" name="confirmPassword" required autocomplete="new-password"></div>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i> <%= user ? 'Reset Password' : 'Create User' %></button>
+        <a class="btn btn-outline-secondary" href="/users">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

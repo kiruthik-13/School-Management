@@ -1,0 +1,28 @@
+{
+  "name": "school-management-firebase",
+  "version": "1.0.0",
+  "description": "School Management System - Firebase Hosting + Firestore + Cloud Functions",
+  "main": "src/index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions,hosting",
+    "shell": "firebase functions:shell",
+    "start": "firebase emulators:start",
+    "deploy": "firebase deploy --only functions,hosting",
+    "seed": "node seed.js",
+    "test": "node smoke-test.js",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.10.0",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.0"
+  },
+  "private": true
+}

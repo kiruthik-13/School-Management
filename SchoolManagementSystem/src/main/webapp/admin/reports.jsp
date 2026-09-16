@@ -50,7 +50,7 @@ stuCounts.push(${row.count});
 <c:forEach items="${feeByClass}" var="row">
 feeCounts.push(${row.total});
 </c:forEach>
-new Chart(document.getElementById('stuChart'), { type: 'bar', data: { labels: classLabels, datasets: [{ label: 'Students', data: stuCounts, backgroundColor: '#0d6efd' }] }, options: { plugins: { legend: { display: false } } } });
-new Chart(document.getElementById('feeChart'), { type: 'bar', data: { labels: classLabels, datasets: [{ label: 'Fees collected (Rs)', data: feeCounts, backgroundColor: '#198754' }] }, options: { plugins: { legend: { display: false } } } });
+new Chart(document.getElementById('stuChart'), { type: 'bar', data: { labels: classLabels, datasets: [{ label: 'Students', data: stuCounts, backgroundColor: '#4f46e5' }] }, options: { plugins: { legend: { display: false } } } });
+new Chart(document.getElementById('feeChart'), { type: 'bar', data: { labels: classLabels, datasets: [{ label: 'Fees collected (Rs)', data: feeCounts, backgroundColor: '#10b981' }] }, options: { plugins: { legend: { display: false } } } });
 </script>
 <%@ include file="/WEB-INF/includes/footer.jspf" %>

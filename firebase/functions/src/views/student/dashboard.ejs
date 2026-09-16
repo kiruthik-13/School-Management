@@ -1,0 +1,120 @@
+<%- include('../partials/head', { pageTitle: 'Student Portal', active: 'dashboard' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0891b2,#22d3ee)"><i class="bi bi-mortarboard"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= student.fullName %></h1>
+    <p class="page-head-sub"><%= student.className %> <%= student.section || '' %> &middot; Admission #<%= student.admissionNo %> &middot; Students can view their own marks, attendance and fees.</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon text-primary"><i class="bi bi-calendar-check"></i></div>
+      <div><div class="stat-value"><%= attendanceStats.present %>/<%= attendanceStats.total %></div><div class="stat-label">Days Present</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-graph-up"></i></div>
+      <div><div class="stat-value"><%= attendanceStats.percentage %>%</div><div class="stat-label">Attendance Rate</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#dc2626;background:rgba(220,38,38,.12)"><i class="bi bi-cash-stack"></i></div>
+      <div><div class="stat-value">Rs <%= dues.reduce(function (s, d) { return s + (d.remaining || 0); }, 0).toFixed(0) %></div><div class="stat-label">Fee Dues</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <div class="stat-icon" style="color:#7c3aed;background:rgba(124,58,237,.12)"><i class="bi bi-award"></i></div>
+      <div><div class="stat-value" style="font-size:1.1rem"><%= marks.length > 0 ? marks.length : 0 %></div><div class="stat-label">Subjects Graded</div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-wallet2 me-2 text-danger"></i>My Fees</span></div>
+      <div class="card-body p-0">
+        <% if (!dues || !dues.length) { %>
+          <div class="empty-state"><i class="bi bi-check2-circle empty-icon"></i><div class="empty-title">All caught up!</div><div class="empty-sub">No outstanding fees.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Fee Type</th><th class="text-end">Amount</th><th class="text-end">Paid</th><th class="text-end">Due</th><th>Status</th></tr></thead><tbody><% (dues || []).forEach(function (d) { %><tr>
+          <td class="fw-semibold"><%= d.feeType %></td>
+          <td class="text-end">Rs <%= Number(d.amount).toFixed(2) %></td>
+          <td class="text-end">Rs <%= Number(d.paid).toFixed(2) %></td>
+          <td class="text-end"><strong class="<%= d.remaining > 0 ? 'text-danger' : '' %>"><%= d.remaining > 0 ? 'Rs ' + Number(d.remaining).toFixed(2) : '-' %></strong></td>
+          <td><span class="badge text-bg-<%= d.status === 'PAID' ? 'success' : d.status === 'PARTIAL' ? 'warning' : 'danger' %>"><%= d.status %></span></td>
+        </tr><% }) %></tbody></table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-bus-front me-2 text-info"></i>Transport</span></div>
+      <div class="card-body">
+        <% if (transport && transport.routeName) { %>
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon text-info"><i class="bi bi-bus-front"></i></div>
+            <div>
+              <div class="fw-bold"><%= transport.routeName %></div>
+              <div class="text-muted small"><%= transport.vehicleNo || '' %> <%= transport.driverName ? '/ ' + transport.driverName : '' %></div>
+              <div class="text-muted small mt-1">Fare: Rs <%= Number(transport.fare || 0).toFixed(2) %></div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="empty-state"><i class="bi bi-bus-front empty-icon"></i><div class="empty-title">No route assigned</div><div class="empty-sub">Transport details will appear here once assigned.</div></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-clipboard-check me-2 text-success"></i>My Attendance</span></div>
+      <div class="card-body p-0">
+        <% if (!recentAttendance || !recentAttendance.length) { %>
+          <div class="empty-state"><i class="bi bi-calendar-x empty-icon"></i><div class="empty-title">No records yet</div><div class="empty-sub">Attendance will show here once marked.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Date</th><th class="text-end">Status</th></tr></thead><tbody><% (recentAttendance || []).slice(0, 10).forEach(function (r) { %><tr>
+          <td><%= r.attendanceDate %></td><td class="text-end"><span class="badge text-bg-<%= r.status === 'PRESENT' ? 'success' : r.status === 'ABSENT' ? 'danger' : 'secondary' %>"><i class="bi bi-<%= r.status === 'PRESENT' ? 'check-lg' : r.status === 'ABSENT' ? 'x-lg' : 'dash-lg' %> me-1"></i><%= r.status %></span></td>
+        </tr><% }) %></tbody></table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-wallet2 me-2 text-warning"></i>Fee Payments</span></div>
+      <div class="card-body p-0">
+        <% if (!payments || !payments.length) { %>
+          <div class="empty-state"><i class="bi bi-receipt empty-icon"></i><div class="empty-title">No payments yet</div><div class="empty-sub">Payments will appear here once recorded.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Date</th><th>Mode</th><th class="text-end">Amount</th></tr></thead><tbody><% (payments || []).slice(0, 10).forEach(function (p) { %><tr>
+          <td><%= p.paymentDate %></td><td><%= p.paymentMode %></td><td class="text-end">Rs <%= Number(p.amountPaid).toFixed(2) %></td>
+        </tr><% }) %></tbody></table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4"><div class="card-header"><span class="header-title"><i class="bi bi-award me-2 text-primary"></i>My Exam Results</span></div>
+  <div class="card-body p-0">
+    <% if (!marks || !marks.length) { %>
+      <div class="empty-state"><i class="bi bi-journal-x empty-icon"></i><div class="empty-title">No results yet</div><div class="empty-sub">Marks will appear once exams are graded.</div></div>
+    <% } else { %>
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Exam</th><th>Subject</th><th class="text-end">Marks</th><th class="text-end">Max</th><th class="text-end">Grade</th></tr></thead><tbody><% (marks || []).forEach(function (m) { %><tr>
+      <td><strong><%= m.examName %></strong><br><small class="text-muted"><%= m.examDate || '' %></small></td>
+      <td><%= m.subjectName %></td>
+      <td class="text-end"><strong><%= m.marksObtained %></strong></td>
+      <td class="text-end"><%= m.maxMarks %></td>
+      <td class="text-end"><span class="badge text-bg-<%= (m.grade || 'F') === 'F' ? 'danger' : (m.grade || '').startsWith('A') ? 'success' : 'info' %>"><%= m.grade %></span></td>
+    </tr><% }) %></tbody></table></div>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,6 +1,6 @@
 </div>
 </div>
-<footer class="bg-light text-center text-muted py-3 mt-4">
+<footer class="text-center py-3 mt-4 app-footer">
     <small>&copy; 2026 School Management System &middot; Java Servlet / JSP / MySQL demo</small>
 </footer>
 </body>

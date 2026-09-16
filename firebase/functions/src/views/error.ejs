@@ -1,0 +1,4 @@
+<%- include('partials/head', { pageTitle: 'Error', active: 'error' }) %>
+<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill"></i> <%= (typeof message !== 'undefined' && message) ? message : 'Something went wrong.' %></div>
+<a href="/" class="btn btn-primary">Go Home</a>
+<%- include('partials/footer') %>

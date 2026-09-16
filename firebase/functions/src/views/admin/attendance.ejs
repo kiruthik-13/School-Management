@@ -1,0 +1,72 @@
+<%- include('../partials/head', { pageTitle: 'Attendance', active: 'attendance' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#059669,#34d399)"><i class="bi bi-calendar-check"></i></div>
+  <div>
+    <h1 class="page-head-title">Attendance</h1>
+    <p class="page-head-sub">Mark daily attendance by class and section</p>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4"><div class="card-body">
+  <form method="get" action="/attendance" class="row g-2 align-items-end">
+    <div class="col-auto"><label class="form-label mb-1">Class</label><select name="className" class="form-select" onchange="this.form.submit()"><option value="">All classes</option><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= filterClass === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+    <div class="col-auto"><label class="form-label mb-1">Section</label><select name="section" class="form-select" onchange="this.form.submit()"><option value="">All sections</option><% SECTIONS.forEach(function (s) { %><option value="<%= s %>" <%= filterSection === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+    <div class="col-auto"><label class="form-label mb-1">Date</label><input type="date" name="date" class="form-control" value="<%= filterDate %>" onchange="this.form.submit()"></div>
+  </form>
+</div></div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-check-circle"></i></div>
+    <div><div class="stat-value"><%= present %></div><div class="stat-label">Present</div></div>
+  </div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#dc2626;background:rgba(220,38,38,.12)"><i class="bi bi-x-circle"></i></div>
+    <div><div class="stat-value"><%= absent %></div><div class="stat-label">Absent</div></div>
+  </div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon text-primary"><i class="bi bi-people"></i></div>
+    <div><div class="stat-value"><%= students.length %></div><div class="stat-label">Roll Size</div></div>
+  </div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#d97706;background:rgba(217,119,6,.12)"><i class="bi bi-calendar3"></i></div>
+    <div><div class="stat-value" style="font-size:1.05rem"><%= filterDate %></div><div class="stat-label">Selected Date</div></div>
+  </div></div></div>
+</div>
+
+<% if (!filterClass) { %>
+  <div class="card"><div class="card-body py-5 text-center"><div class="empty-state">
+    <i class="bi bi-arrow-up-circle empty-icon"></i><div class="empty-title">Select a class &amp; section</div><div class="empty-sub">Pick filters above to load the attendance sheet.</div>
+  </div></div></div>
+<% } else if (!records || !records.length) { %>
+  <div class="card"><div class="card-body py-5 text-center"><div class="empty-state">
+    <i class="bi bi-inbox empty-icon"></i><div class="empty-title">No students in this class</div><div class="empty-sub">No students match the selected filters.</div>
+  </div></div></div>
+<% } else { %>
+<div class="card shadow-sm table-card"><div class="card-body">
+  <form method="post" action="/attendance/save">
+    <input type="hidden" name="date" value="<%= filterDate %>">
+    <input type="hidden" name="className" value="<%= filterClass %>">
+    <input type="hidden" name="section" value="<%= filterSection %>">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-3">
+        <thead><tr><th>Student</th><th class="w-25">Status</th></tr></thead>
+        <tbody><% (records || []).forEach(function (r) { %><tr>
+          <td class="fw-semibold"><i class="bi bi-person-circle me-2 text-muted"></i><%= r.studentName %><% if (r.admissionNo) { %><small class="text-muted d-block">#<%= r.admissionNo %></small><% } %></td>
+          <td><div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="status_<%= r.studentId %>" id="p_<%= r.studentId %>" value="PRESENT" <%= r.status === 'PRESENT' ? 'checked' : '' %>>
+            <label class="btn btn-outline-success" for="p_<%= r.studentId %>"><i class="bi bi-check-lg me-1"></i>Present</label>
+            <input type="radio" class="btn-check" name="status_<%= r.studentId %>" id="a_<%= r.studentId %>" value="ABSENT" <%= r.status === 'ABSENT' ? 'checked' : '' %>>
+            <label class="btn btn-outline-danger" for="a_<%= r.studentId %>"><i class="bi bi-x-lg me-1"></i>Absent</label>
+            <input type="radio" class="btn-check" name="status_<%= r.studentId %>" id="l_<%= r.studentId %>" value="LEAVE" <%= r.status === 'LEAVE' ? 'checked' : '' %>>
+            <label class="btn btn-outline-secondary" for="l_<%= r.studentId %>">Leave</label>
+          </div></td>
+        </tr><% }) %></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i> Save Attendance</button>
+  </form>
+</div></div>
+<% } %>
+<%- include('../partials/footer') %>

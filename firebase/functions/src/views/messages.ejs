@@ -1,0 +1,48 @@
+<%- include('partials/head', { pageTitle: 'Messages', active: 'messages' }) %>
+<%- include('partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)"><i class="bi bi-chat-dots"></i></div>
+  <div>
+    <h1 class="page-head-title">Messages</h1>
+    <p class="page-head-sub">Send messages to parents and teachers</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-send me-2 text-primary"></i>Compose Message</span></div>
+      <div class="card-body">
+        <form method="post" action="/message/send">
+          <div class="mb-3"><label class="form-label">Recipient</label><select class="form-select" name="receiverId" required><option value="">-- Select --</option><% (recipients || []).forEach(function (r) { %><option value="<%= r.userId %>"><%= r.fullName || r.username %> (<%= MESSAGE_ROLE_LABELS[r.role] || r.role %>)</option><% }) %></select></div>
+          <div class="mb-3"><label class="form-label">Related Student</label><select class="form-select" name="studentId"><option value="0">-- None --</option><% (students || []).forEach(function (s) { %><option value="<%= s.studentId %>"><%= s.fullName %></option><% }) %></select></div>
+          <div class="mb-3"><label class="form-label">Subject</label><input class="form-control" name="subject"></div>
+          <div class="mb-3"><label class="form-label">Message</label><textarea class="form-control" name="messageBody" rows="4" required></textarea></div>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-send me-1"></i> Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card shadow-sm table-card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-inbox me-2 text-primary"></i>Inbox &amp; Sent</span></div>
+      <div class="card-body p-0">
+        <% if (!conversation || !conversation.length) { %>
+          <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No messages yet</div><div class="empty-sub">Compose a message on the left.</div></div>
+        <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>From / To</th><th>Student</th><th>Subject</th><th>Message</th><th>Time</th></tr></thead>
+            <tbody><% (conversation || []).forEach(function (m) { %><tr>
+              <td><strong><%= m.senderName %></strong> <span class="badge text-bg-light border"><%= m.senderRole %></span></td>
+              <td><%= m.studentName || '-' %></td>
+              <td class="fw-semibold"><%= m.subject || '<span class="text-muted">(no subject)</span>' %></td>
+              <td><small class="text-muted"><%= m.messageBody %></small></td>
+              <td class="text-muted small"><%= (function (t) { var ts = t && t.toDate ? t.toDate() : t; return ts ? new Date(ts).toLocaleString() : ''; })(m.sentAt) %></td>
+            </tr><% }) %></tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

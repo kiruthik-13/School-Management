@@ -1,0 +1,56 @@
+<%- include('../partials/head', { pageTitle: 'Examinations', active: 'exams' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon"><i class="bi bi-clipboard-check"></i></div>
+  <div>
+    <h1 class="page-head-title">Examinations</h1>
+    <p class="page-head-sub">Schedule exams and open them for marks entry</p>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-calendar-plus me-2 text-primary"></i>Schedule Exam</span></div>
+      <div class="card-body">
+        <form method="post" action="/exam/save" class="row g-3">
+          <div class="col-md-6"><label class="form-label">Exam Name</label><input class="form-control" name="examName" placeholder="e.g. Half Yearly" required autofocus></div>
+          <div class="col-md-6"><label class="form-label">Exam Type</label><input class="form-control" name="examType" placeholder="Mid Term 1"></div>
+          <div class="col-md-6"><label class="form-label">Class</label><select class="form-select" name="className" required><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= filterClass === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+          <div class="col-md-6"><label class="form-label">Exam Date</label><input type="date" class="form-control" name="examDate"></div>
+          <div class="col-12"><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i> Save Exam</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm table-card h-100"><div class="card-header d-flex align-items-center justify-content-between">
+        <span class="header-title"><i class="bi bi-list-ul me-2 text-primary"></i>Scheduled Exams</span>
+        <span class="badge text-bg-primary"><%= (exams || []).length %></span>
+      </div>
+      <div class="card-body p-0">
+        <form method="get" action="/exams" class="p-3 pb-0">
+          <select name="className" class="form-select" onchange="this.form.submit()">
+            <option value="">All classes</option><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= filterClass === c ? 'selected' : '' %>><%= c %></option><% }) %>
+          </select>
+        </form>
+        <% if (!exams || !exams.length) { %>
+          <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No exams scheduled</div><div class="empty-sub">Schedule your first exam on the left.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+          <thead><tr><th>Exam</th><th>Class</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <tbody><% (exams || []).forEach(function (e) { %><tr>
+            <td class="fw-semibold"><i class="bi bi-journal-check me-2 text-muted"></i><%= e.examName %><% if (e.examType) { %><small class="d-block text-muted"><%= e.examType %></small><% } %></td>
+            <td><span class="badge text-bg-light border"><%= e.className %></span></td>
+            <td><%= e.examDate || '-' %></td>
+            <td class="text-end"><div class="btn-group btn-group-sm">
+              <a class="btn btn-outline-primary" href="/marks?examId=<%= e.examId %>&className=<%= encodeURIComponent(e.className) %>"><i class="bi bi-pencil-square"></i> Marks</a>
+              <a class="btn btn-outline-danger" href="/exam/delete?id=<%= e.examId %>" data-confirm="Delete exam <%= e.examName %> and its results?"><i class="bi bi-trash"></i></a>
+            </div></td>
+          </tr><% }) %></tbody>
+        </table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,81 @@
+<%- include('partials/head', { pageTitle: 'Settings', active: '' }) %>
+<%- include('partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"><i class="bi bi-gear"></i></div>
+  <div>
+    <h1 class="page-head-title">Settings</h1>
+    <p class="page-head-sub">Manage preferences for your clock and time</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm"><div class="card-header"><span class="header-title"><i class="bi bi-type me-2 text-primary"></i>Font Style</span></div>
+      <div class="card-body">
+        <label class="form-label">Text style</label>
+        <select id="fontStyle" class="form-select mb-2">
+          <option value="modern">Modern (default)</option>
+          <option value="serif">Classic Serif</option>
+          <option value="sans">Clean Sans</option>
+          <option value="mono">Typewriter</option>
+        </select>
+        <div class="form-text">Applied instantly across the whole app.</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm"><div class="card-header"><span class="header-title"><i class="bi bi-arrows-expand me-2 text-warning"></i>Font Size</span></div>
+      <div class="card-body">
+        <label class="form-label">Text size</label>
+        <select id="fontSize" class="form-select mb-2">
+          <option value="sm">Small</option>
+          <option value="md">Normal</option>
+          <option value="lg">Large</option>
+          <option value="xl">Extra Large</option>
+        </select>
+        <div class="text-muted small">Preview: <span id="sizePreview">The quick brown fox jumps over the lazy dog.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    function get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
+    function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    var root = document.documentElement;
+    var fs = document.getElementById('fontStyle');
+    var fz = document.getElementById('fontSize');
+    var prev = document.getElementById('sizePreview');
+    function applyStyle() {
+      if (!fs) return;
+      var map = { modern: null, serif: "Georgia, serif", sans: "'Segoe UI', sans-serif", mono: "'Courier New', monospace" };
+      prev.style.fontFamily = map[fs.value] || 'inherit';
+    }
+    function applySize() {
+      if (!fz) return;
+      var map = { sm: '0.85rem', md: '1rem', lg: '1.4rem', xl: '1.75rem' };
+      prev.style.fontSize = map[fz.value] || '1rem';
+    }
+    if (fs) {
+      fs.value = get('sms-font', 'modern');
+      fs.addEventListener('change', function () {
+        set('sms-font', this.value);
+        root.setAttribute('data-font', this.value);
+        applyStyle();
+        if (window.SMS) window.SMS.toast('success', 'Font style updated');
+      });
+    }
+    if (fz) {
+      fz.value = get('sms-fontsize', 'md');
+      fz.addEventListener('change', function () {
+        set('sms-fontsize', this.value);
+        root.setAttribute('data-fontsize', this.value);
+        applySize();
+        if (window.SMS) window.SMS.toast('success', 'Font size updated');
+      });
+    }
+    applyStyle();
+    applySize();
+  })();
+</script>
+<%- include('partials/footer') %>

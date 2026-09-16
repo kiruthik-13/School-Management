@@ -1,0 +1,68 @@
+<%- include('../partials/head', { pageTitle: 'School Reports', active: 'reports' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24)"><i class="bi bi-graph-up"></i></div>
+  <div>
+    <h1 class="page-head-title">School Reports</h1>
+    <p class="page-head-sub">Attendance, fees and exam performance at a glance</p>
+  </div>
+  <div class="page-head-actions">
+    <a class="btn btn-outline-secondary" href="/reports" onclick="window.print();return false;"><i class="bi bi-printer me-1"></i> Print</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#16a34a;background:rgba(22,163,74,.12)"><i class="bi bi-check-circle"></i></div>
+    <div><div class="stat-value"><%= presentToday %></div><div class="stat-label">Present Today</div></div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#dc2626;background:rgba(220,38,38,.12)"><i class="bi bi-x-circle"></i></div>
+    <div><div class="stat-value"><%= absentToday %></div><div class="stat-label">Absent Today</div></div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon" style="color:#4f46e5;background:rgba(79,70,229,.12)"><i class="bi bi-cash-stack"></i></div>
+    <div><div class="stat-value">Rs <%= Number(feeTotal).toLocaleString() %></div><div class="stat-label">Fees Collected</div></div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon text-primary"><i class="bi bi-person-video3"></i></div>
+    <div><div class="stat-value"><%= teacherCount %></div><div class="stat-label">Teachers</div></div>
+  </div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100"><div class="card-header"><span class="header-title"><i class="bi bi-people me-2 text-primary"></i>Class-Wise Student Count</span></div>
+      <div class="card-body table-responsive">
+        <table class="table table-sm align-middle"><thead><tr><th>Class</th><th>Section</th><th class="text-end">Students</th></tr></thead><tbody><% (classCounts || []).forEach(function (c) { %><tr><td><span class="badge text-bg-light border"><%= c.className %></span></td><td><%= c.section || '-' %></td><td class="text-end"><%= c.count %></td></tr><% }) %></tbody></table>
+      </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100"><div class="card-header"><span class="header-title"><i class="bi bi-cash-stack me-2 text-success"></i>Fee Collection by Class</span></div>
+      <div class="card-body table-responsive">
+        <table class="table table-sm align-middle"><thead><tr><th>Class</th><th class="text-end">Payments</th><th class="text-end">Collected</th></tr></thead><tbody><% (feeByClass || []).forEach(function (c) { %><tr><td><span class="badge text-bg-light border"><%= c.className %></span></td><td class="text-end"><%= c.count %></td><td class="text-end fw-semibold">Rs <%= Number(c.total).toLocaleString() %></td></tr><% }) %></tbody></table>
+      </div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4"><div class="card-header"><span class="header-title"><i class="bi bi-journal-check me-2 text-primary"></i>Exam Performance Summary</span></div>
+  <div class="card-body table-responsive p-0">
+    <% if (!examSummaries || !examSummaries.length) { %>
+      <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No exam results yet</div><div class="empty-sub">Performance appears once marks are entered.</div></div>
+    <% } else { %>
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead><tr><th>Exam</th><th>Class</th><th class="text-end">Students</th><th class="text-end">Pass</th><th class="text-end">Fail</th><th class="text-end">Average</th><th class="text-end">Pass %</th></tr></thead>
+      <tbody><% (examSummaries || []).forEach(function (e) { %><tr>
+        <td class="fw-semibold"><%= e.examName %></td>
+        <td><span class="badge text-bg-light border"><%= e.className %></span></td>
+        <td class="text-end"><%= e.studentCount %></td>
+        <td class="text-end text-success"><%= e.passes %></td>
+        <td class="text-end text-danger"><%= e.fails %></td>
+        <td class="text-end"><%= e.percent %>%</td>
+        <td class="text-end"><span class="badge <%= e.passPercent >= 75 ? 'text-bg-success' : (e.passPercent >= 50 ? 'text-bg-warning' : 'text-bg-danger') %>"><%= e.passPercent %>%</span></td>
+      </tr><% }) %></tbody>
+    </table>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

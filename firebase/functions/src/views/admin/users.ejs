@@ -1,0 +1,67 @@
+<%- include('../partials/head', { pageTitle: 'Users', active: 'users' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"><i class="bi bi-people-gear"></i></div>
+  <div>
+    <h1 class="page-head-title">Users</h1>
+    <p class="page-head-sub">Login accounts for admins, teachers and parents</p>
+  </div>
+  <div class="page-head-actions">
+    <a href="/user/form" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> Add User</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <% ['ADMIN', 'TEACHER', 'PARENT', 'STUDENT'].forEach(function (r) { var n = (users || []).filter(function (u) { return u.role === r; }).length; %>
+  <div class="col-md-4"><div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+    <div class="stat-icon <%= r === 'ADMIN' ? 'text-primary' : r === 'TEACHER' ? 'text-info' : r === 'STUDENT' ? 'text-info' : 'text-warning' %>"><i class="bi <%= r === 'ADMIN' ? 'bi-person-gear' : r === 'TEACHER' ? 'bi-person-video3' : r === 'STUDENT' ? 'bi-mortarboard' : 'bi-person-heart' %>"></i></div>
+    <div><div class="stat-value"><%= n %></div><div class="stat-label"><%= r === 'ADMIN' ? 'Admins' : r === 'TEACHER' ? 'Teachers' : r === 'STUDENT' ? 'Students' : 'Parents' %></div></div>
+  </div></div></div>
+  <% }) %>
+</div>
+
+<div class="card shadow-sm mb-4"><div class="card-body">
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control" data-table-filter="#usersTable" placeholder="Search username or name..." aria-label="Search users">
+    </div>
+    <form method="get" action="/users" class="d-flex gap-2 ms-auto">
+      <select name="role" class="form-select" onchange="this.form.submit()">
+        <option value="">All roles</option>
+        <option value="ADMIN" <%= roleFilter === 'ADMIN' ? 'selected' : '' %>>Admins</option>
+        <option value="TEACHER" <%= roleFilter === 'TEACHER' ? 'selected' : '' %>>Teachers</option>
+        <option value="PARENT" <%= roleFilter === 'PARENT' ? 'selected' : '' %>>Parents</option>
+        <option value="STUDENT" <%= roleFilter === 'STUDENT' ? 'selected' : '' %>>Students</option>
+      </select>
+    </form>
+  </div>
+</div></div>
+
+<div class="card shadow-sm table-card"><div class="card-body p-0">
+  <% if (!users || !users.length) { %>
+    <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No users found</div><div class="empty-sub">Try a different role filter or add a new user.</div></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="usersTable">
+      <thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Email</th><th>Linked</th><th class="text-end">Actions</th></tr></thead>
+      <tbody><% (users || []).forEach(function (u) { %><tr>
+        <td class="fw-semibold"><code><%= u.username %></code><% if (Number(u.userId) === Number(user.userId)) { %> <span class="badge text-bg-primary">You</span><% } %></td>
+        <td><i class="bi bi-person-circle me-2 text-muted"></i><%= u.fullName || '—' %></td>
+        <td><span class="badge <%= u.role === 'ADMIN' ? 'text-bg-danger' : u.role === 'TEACHER' ? 'text-bg-info' : u.role === 'STUDENT' ? 'text-bg-primary' : 'text-bg-warning' %>"><%= u.role %></span></td>
+        <td><%= u.email || '<span class="text-muted">—</span>' %></td>
+        <td><small><%= u.linkedName || '<span class="text-muted">Standalone</span>' %></small></td>
+        <td class="text-end"><div class="btn-group btn-group-sm">
+          <a class="btn btn-outline-secondary" href="/user/form?reset=<%= u.userId %>" title="Reset password"><i class="bi bi-key"></i></a>
+          <% if (Number(u.userId) === Number(user.userId)) { %>
+            <button class="btn btn-outline-danger" disabled title="You cannot delete your own account"><i class="bi bi-trash"></i></button>
+          <% } else { %>
+            <a class="btn btn-outline-danger" href="/user/delete?id=<%= u.userId %>" data-confirm="Delete the login account &quot;<%= u.username %>&quot;?"><i class="bi bi-trash"></i></a>
+          <% } %>
+        </div></td>
+      </tr><% }) %></tbody>
+    </table>
+  </div>
+  <% } %>
+</div></div>
+<%- include('../partials/footer') %>

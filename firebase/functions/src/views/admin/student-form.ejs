@@ -1,0 +1,47 @@
+<%- include('../partials/head', { pageTitle: 'Student Details', active: 'students' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon"><i class="bi bi-person-badge"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= student ? 'Edit Student' : 'Add Student' %></h1>
+    <p class="page-head-sub"><%= student ? 'Update admission and profile details' : 'Register a new admission' %></p>
+  </div>
+  <div class="page-head-actions"><a class="btn btn-outline-secondary" href="/students"><i class="bi bi-arrow-left me-1"></i> Back to Students</a></div>
+</div>
+
+<div class="card shadow-sm" style="max-width: 720px">
+  <div class="card-header"><span class="header-title"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Student Information</span></div>
+  <div class="card-body">
+    <form method="post" action="/student/save">
+      <input type="hidden" name="studentId" value="<%= student ? student.studentId : '' %>">
+      <input type="hidden" name="admissionNo" value="<%= student ? student.admissionNo : '' %>">
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">First Name</label><input class="form-control" name="firstName" placeholder="e.g. Arun" required value="<%= student ? student.firstName : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Last Name</label><input class="form-control" name="lastName" placeholder="e.g. Kumar" value="<%= student ? student.lastName : '' %>"></div>
+        <div class="col-md-4"><label class="form-label">Class</label><select class="form-select" name="className" required><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= student && student.className === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+        <div class="col-md-4"><label class="form-label">Section</label><select class="form-select" name="section" required><% SECTIONS.forEach(function (s) { %><option value="<%= s %>" <%= student && student.section === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+        <div class="col-md-4"><label class="form-label">Gender</label><select class="form-select" name="gender"><option value="">--</option><option value="M" <%= student && student.gender === 'M' ? 'selected' : '' %>>Male</option><option value="F" <%= student && student.gender === 'F' ? 'selected' : '' %>>Female</option><option value="O" <%= student && student.gender === 'O' ? 'selected' : '' %>>Other</option></select></div>
+        <div class="col-md-6"><label class="form-label">Date of Birth</label><input type="date" class="form-control" name="dob" value="<%= student ? student.dob : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Parent Account</label><select class="form-select" name="parentId" id="parentSelect"><option value="0">-- No parent linked --</option><% (parents || []).forEach(function (p) { %><option value="<%= p.userId %>" <%= student && String(student.parentId) === String(p.userId) ? 'selected' : '' %>><%= p.fullName || p.username %></option><% }) %></select></div>
+        <div class="col-12">
+          <div class="form-check"><input class="form-check-input" type="checkbox" name="parentChoice" value="new" id="newParentCheck"><label class="form-check-label" for="newParentCheck">Create a new parent account</label></div>
+        </div>
+        <div class="col-md-6" id="newParentFields" style="display:none"><label class="form-label">New Parent Name</label><input class="form-control" name="newParentName"></div>
+        <div class="col-md-6" id="newParentEmailWrap" style="display:none"><label class="form-label">New Parent Email</label><input type="email" class="form-control" name="newParentEmail"></div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i> Save Student</button>
+          <a class="btn btn-outline-secondary" href="/students">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById('newParentCheck').addEventListener('change', function () {
+    var show = this.checked;
+    document.getElementById('newParentFields').style.display = show ? 'block' : 'none';
+    document.getElementById('newParentEmailWrap').style.display = show ? 'block' : 'none';
+    document.getElementById('parentSelect').disabled = show;
+  });
+</script>
+<%- include('../partials/footer') %>

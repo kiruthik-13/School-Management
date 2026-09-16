@@ -1,0 +1,47 @@
+<%- include('../partials/head', { pageTitle: 'Class & Subjects', active: 'subjects' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon"><i class="bi bi-book"></i></div>
+  <div>
+    <h1 class="page-head-title">Class &amp; Subjects</h1>
+    <p class="page-head-sub">Create subjects and assign teachers</p>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <div class="card h-100"><div class="card-header"><span class="header-title"><i class="bi bi-plus-circle me-2 text-primary"></i>Add Subject</span></div>
+      <div class="card-body">
+        <form method="post" action="/subject/save" class="row g-3">
+          <div class="col-12"><label class="form-label">Subject Name</label><input class="form-control" name="subjectName" placeholder="e.g. Mathematics" required autofocus></div>
+          <div class="col-md-6"><label class="form-label">Class</label><select class="form-select" name="className" required><% CLASSES.forEach(function (c) { %><option value="<%= c %>"><%= c %></option><% }) %></select></div>
+          <div class="col-md-6"><label class="form-label">Teacher</label><select class="form-select" name="teacherId"><option value="0">-- Unassigned --</option><% (teachers || []).forEach(function (t) { %><option value="<%= t.teacherId %>"><%= t.fullName %></option><% }) %></select></div>
+          <div class="col-12"><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i> Save Subject</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm table-card h-100"><div class="card-header d-flex align-items-center justify-content-between">
+        <span class="header-title"><i class="bi bi-list-ul me-2 text-primary"></i>All Subjects</span>
+        <span class="badge text-bg-primary"><%= (subjects || []).length %></span>
+      </div>
+      <div class="card-body p-0">
+        <% if (!subjects || !subjects.length) { %>
+          <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No subjects yet</div><div class="empty-sub">Add your first subject on the left.</div></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+          <thead><tr><th>Subject</th><th>Class</th><th>Teacher</th><th class="text-end">Actions</th></tr></thead>
+          <tbody><% (subjects || []).forEach(function (s) { %><tr>
+            <td class="fw-semibold"><i class="bi bi-journal-bookmark me-2 text-muted"></i><%= s.subjectName %></td>
+            <td><span class="badge text-bg-light border"><%= s.className %></span></td>
+            <td><%= s.teacherName || '<span class="text-muted">Unassigned</span>' %></td>
+            <td class="text-end"><a class="btn btn-sm btn-outline-danger" href="/subject/delete?id=<%= s.subjectId %>" data-confirm="Delete subject <%= s.subjectName %>?"><i class="bi bi-trash"></i></a></td>
+          </tr><% }) %></tbody>
+        </table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

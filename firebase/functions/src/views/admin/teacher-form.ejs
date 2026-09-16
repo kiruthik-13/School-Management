@@ -1,0 +1,32 @@
+<%- include('../partials/head', { pageTitle: 'Teacher Details', active: 'teachers' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#0891b2,#22d3ee)"><i class="bi bi-person-video3"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= teacher ? 'Edit Teacher' : 'Add Teacher' %></h1>
+    <p class="page-head-sub"><%= teacher ? 'Update staff profile and contact details' : 'Create a staff profile and login' %></p>
+  </div>
+  <div class="page-head-actions"><a class="btn btn-outline-secondary" href="/teachers"><i class="bi bi-arrow-left me-1"></i> Back to Teachers</a></div>
+</div>
+
+<div class="card shadow-sm" style="max-width: 720px">
+  <div class="card-header"><span class="header-title"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Teacher Information</span></div>
+  <div class="card-body">
+    <form method="post" action="/teacher/save">
+      <input type="hidden" name="teacherId" value="<%= teacher ? teacher.teacherId : '' %>">
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">First Name</label><input class="form-control" name="firstName" placeholder="e.g. Priya" required value="<%= teacher ? teacher.firstName : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Last Name</label><input class="form-control" name="lastName" placeholder="e.g. Sharma" value="<%= teacher ? teacher.lastName : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Subject Specialization</label><input class="form-control" name="subjectSpecialization" placeholder="e.g. Mathematics" value="<%= teacher ? teacher.subjectSpecialization || '' : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Phone</label><input class="form-control" name="phone" placeholder="98765 43210" value="<%= teacher ? teacher.phone || '' : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Joining Date</label><input type="date" class="form-control" name="joiningDate" value="<%= teacher ? teacher.joiningDate || '' : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Email (used for login account)</label><input type="email" class="form-control" name="email" placeholder="name@school.edu" value="<%= teacher ? teacher.email || '' : '' %>" <%= teacher ? 'disabled' : 'required' %>></div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i> Save Teacher</button>
+          <a class="btn btn-outline-secondary" href="/teachers">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

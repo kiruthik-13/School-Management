@@ -1,0 +1,42 @@
+<%- include('../partials/head', { pageTitle: 'Student Transport', active: 'transport' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)"><i class="bi bi-people"></i></div>
+  <div>
+    <h1 class="page-head-title">Student Transport List</h1>
+    <p class="page-head-sub">Assign students to routes by bus</p>
+  </div>
+  <div class="page-head-actions">
+    <a class="btn btn-outline-secondary" href="/transport"><i class="bi bi-bus-front me-1"></i> Routes</a>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4"><div class="card-body">
+  <form method="post" action="/transport/assign" class="row g-2 align-items-end">
+    <div class="col-md-5"><label class="form-label mb-1">Student</label><select class="form-select" name="studentId" required><option value="">-- Assign student --</option><% (rows || []).forEach(function (r) { %><option value="<%= r.studentId %>"><%= r.studentName %> (<%= r.className %>)</option><% }) %></select></div>
+    <div class="col-md-5"><label class="form-label mb-1">Route</label><select class="form-select" name="routeId" required><option value="">-- Route --</option><% (routes || []).forEach(function (rt) { %><option value="<%= rt.routeId %>"><%= rt.routeName %> (Rs <%= Number(rt.fare).toFixed(0) %>)</option><% }) %></select></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit"><i class="bi bi-link-45deg me-1"></i> Assign</button></div>
+  </form>
+</div></div>
+
+<div class="card shadow-sm table-card"><div class="card-body p-0">
+  <% if (!rows || !rows.length) { %>
+    <div class="empty-state"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No students yet</div><div class="empty-sub">Add students to begin assigning routes.</div></div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Student</th><th>Class</th><th>Route</th><th>Vehicle</th><th>Driver</th><th class="text-end">Fare</th><th class="text-end">Actions</th></tr></thead>
+      <tbody><% (rows || []).forEach(function (r) { %><tr>
+        <td class="fw-semibold"><i class="bi bi-person-circle me-2 text-muted"></i><%= r.studentName %></td>
+        <td><span class="badge text-bg-light border"><%= r.className %> <%= r.section %></span></td>
+        <td><%= r.routeName === '-' ? '<span class="text-muted">Not assigned</span>' : '<i class="bi bi-signpost-2 me-1 text-muted"></i>' + r.routeName %></td>
+        <td><code><%= r.vehicleNo === '-' ? '-' : r.vehicleNo %></code></td>
+        <td><%= r.driverName === '-' ? '-' : r.driverName %></td>
+        <td class="text-end"><strong>Rs <%= Number(r.fare).toFixed(2) %></strong></td>
+        <td class="text-end"><% if (r.routeName !== '-') { %><a class="btn btn-sm btn-outline-danger" href="/transport/remove?studentId=<%= r.studentId %>" data-confirm="Remove <%= r.studentName %> from transport?"><i class="bi bi-unlink me-1"></i>Remove</a><% } %></td>
+      </tr><% }) %></tbody>
+    </table>
+  </div>
+  <% } %>
+</div></div>
+<%- include('../partials/footer') %>

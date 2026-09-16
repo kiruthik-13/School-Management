@@ -1,0 +1,65 @@
+<%- include('../partials/head', { pageTitle: 'Marks & Results', active: 'marks' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon"><i class="bi bi-pencil-square"></i></div>
+  <div>
+    <h1 class="page-head-title">Marks &amp; Results</h1>
+    <p class="page-head-sub">Enter marks per subject; saving re-updates the existing row</p>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4"><div class="card-body">
+  <form method="get" action="/marks" class="row g-2 align-items-end">
+    <div class="col-auto"><label class="form-label mb-1">Exam</label><select name="examId" class="form-select" onchange="this.form.submit()"><option value="0">-- Select exam --</option><% (exams || []).forEach(function (e) { %><option value="<%= e.examId %>" <%= Number(filterExam) === Number(e.examId) ? 'selected' : '' %>><%= e.examName %> (<%= e.className %>)</option><% }) %></select></div>
+    <div class="col-auto"><label class="form-label mb-1">Class</label><select name="className" class="form-select" onchange="this.form.submit()"><option value="">All classes</option><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= filterClass === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+    <div class="col-auto"><label class="form-label mb-1">Section</label><select name="section" class="form-select" onchange="this.form.submit()"><option value="">All sections</option><% SECTIONS.forEach(function (s) { %><option value="<%= s %>" <%= filterSection === s ? 'selected' : '' %>><%= s %></option><% }) %></select></div>
+  </form>
+</div></div>
+
+<% if (!selected) { %>
+  <div class="card"><div class="card-body py-5 text-center"><div class="empty-state">
+    <i class="bi bi-arrow-up-circle empty-icon"></i><div class="empty-title">Select an exam to begin</div><div class="empty-sub">Choose an exam above to load the marks grid.</div>
+  </div></div></div>
+<% } else { %>
+<div class="card shadow-sm mb-4"><div class="card-body">
+  <div class="d-flex align-items-center gap-2 mb-1">
+    <i class="bi bi-journal-check text-primary fs-4"></i>
+    <h5 class="card-title mb-0"><%= selected.examName %></h5>
+    <span class="badge text-bg-light border"><%= selected.className %></span>
+  </div>
+  <small class="text-muted">Enter marks per subject below each cell. Re-saving a cell updates the existing row.</small>
+  <% if (!students || !students.length) { %>
+    <div class="empty-state mt-3"><i class="bi bi-inbox empty-icon"></i><div class="empty-title">No students match this filter</div><div class="empty-sub">Choose a class with students enrolled.</div></div>
+  <% } else { %>
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered align-middle">
+      <thead><tr><th class="bg-light">Student</th><% (subjects || []).forEach(function (su) { %><th class="text-center bg-light"><span class="d-block fw-semibold"><%= su.subjectName %></span><small class="text-muted fw-normal"><%= su.teacherName ? su.teacherName.split(' ')[0] : '' %></small></th><% }) %><th class="text-end bg-light">Actions</th></tr></thead>
+      <tbody>
+        <% (students || []).forEach(function (st) { %>
+        <tr>
+          <td><strong><%= st.fullName %></strong> <span class="text-muted">#<%= st.studentId %></span></td>
+          <% (subjects || []).forEach(function (su) { %>
+            <% var r = (results || []).find(function (x) { return Number(x.studentId) === Number(st.studentId) && Number(x.subjectId) === Number(su.subjectId); }); %>
+            <td>
+              <form method="post" action="/result/save" class="row g-1">
+                <input type="hidden" name="examId" value="<%= selected.examId %>">
+                <input type="hidden" name="studentId" value="<%= st.studentId %>">
+                <input type="hidden" name="subjectId" value="<%= su.subjectId %>">
+                <input type="hidden" name="className" value="<%= selected.className %>">
+                <input type="hidden" name="section" value="<%= st.section || '' %>">
+                <div class="col-7"><input type="number" class="form-control form-control-sm" name="marksObtained" step="0.01" min="0" value="<%= r ? r.marksObtained : '' %>" placeholder="marks"></div>
+                <div class="col-5"><input type="number" class="form-control form-control-sm" name="maxMarks" min="0" value="<%= r ? r.maxMarks : 100 %>" placeholder="max"></div>
+                <div class="col-12"><button class="btn btn-sm <%= r ? 'btn-success' : 'btn-outline-primary' %> w-100" type="submit"><i class="bi bi-check-lg me-1"></i><%= r ? 'Saved ' + r.grade : 'Save' %></button></div>
+              </form>
+            </td>
+          <% }) %>
+          <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="/student/profile?id=<%= st.studentId %>"><i class="bi bi-person me-1"></i>Profile</a> <a class="btn btn-sm btn-outline-primary" href="/report?examId=<%= selected.examId %>&studentId=<%= st.studentId %>"><i class="bi bi-ticket-perforated me-1"></i>Report Card</a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div></div>
+<% } %>
+<%- include('../partials/footer') %>

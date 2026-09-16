@@ -1,0 +1,30 @@
+<%- include('../partials/head', { pageTitle: 'Fee Structure', active: 'fees' }) %>
+<%- include('../partials/header', { user: user, active: active }) %>
+<div class="page-head">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#16a34a,#4ade80)"><i class="bi bi-cash-stack"></i></div>
+  <div>
+    <h1 class="page-head-title"><%= feeStructure ? 'Edit Fee Structure' : 'Add Fee Structure' %></h1>
+    <p class="page-head-sub"><%= feeStructure ? 'Update the amount or due date' : 'Set a class fee and due date' %></p>
+  </div>
+  <div class="page-head-actions"><a class="btn btn-outline-secondary" href="/fees"><i class="bi bi-arrow-left me-1"></i> Back to Fees</a></div>
+</div>
+
+<div class="card shadow-sm" style="max-width: 720px">
+  <div class="card-header"><span class="header-title"><i class="bi bi-receipt me-2 text-success"></i>Fee Details</span></div>
+  <div class="card-body">
+    <form method="post" action="/fee/save">
+      <input type="hidden" name="feeStructureId" value="<%= feeStructure ? feeStructure.feeStructureId : '' %>">
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Class</label><select class="form-select" name="className" required><% CLASSES.forEach(function (c) { %><option value="<%= c %>" <%= (feeStructure ? feeStructure.className : className) === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+        <div class="col-md-6"><label class="form-label">Fee Type</label><input class="form-control" name="feeType" placeholder="e.g. Tuition" required value="<%= feeStructure ? feeStructure.feeType : '' %>"></div>
+        <div class="col-md-6"><label class="form-label">Amount</label><div class="input-group"><span class="input-group-text">Rs</span><input type="number" class="form-control" name="amount" min="0" step="0.01" placeholder="0.00" required value="<%= feeStructure ? feeStructure.amount : '' %>"></div></div>
+        <div class="col-md-6"><label class="form-label">Due Date</label><input type="date" class="form-control" name="dueDate" value="<%= feeStructure ? feeStructure.dueDate || '' : '' %>"></div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-success" type="submit"><i class="bi bi-check-lg me-1"></i> Save Fee</button>
+          <a class="btn btn-outline-secondary" href="/fees">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

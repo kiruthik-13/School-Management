@@ -1,0 +1,42 @@
+<%- include('./partials/head', { pageTitle: 'Report Card', active: '' }) %>
+<%- include('./partials/header', { user: user, active: active }) %>
+<div class="page-head no-print">
+  <div class="page-head-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24)"><i class="bi bi-ticket-perforated"></i></div>
+  <div>
+    <h1 class="page-head-title">Report Card</h1>
+    <p class="page-head-sub"><%= exam.examName %><% if (exam.examDate) { %> &mdash; <%= exam.examDate %><% } %></p>
+  </div>
+  <div class="page-head-actions"><button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer me-1"></i> Print</button></div>
+</div>
+
+<div class="card shadow-sm" style="max-width: 800px">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <div class="fw-bold fs-5"><i class="bi bi-award me-2 text-warning"></i><%= student.fullName %></div>
+        <span class="text-muted">Admission #<%= student.admissionNo %> &mdash; <%= student.className %> <%= student.section %></span>
+      </div>
+      <div class="text-end"><strong><%= exam.examName %></strong><br><span class="text-muted"><%= exam.examDate || '' %></span></div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-striped table-sm align-middle">
+        <thead><tr><th>Subject</th><th class="text-end">Marks Obtained</th><th class="text-end">Max Marks</th><th>Grade</th></tr></thead>
+        <tbody><% (rows || []).forEach(function (r) { %><tr>
+          <td><i class="bi bi-journal-bookmark me-2 text-muted"></i><%= r.subjectName %></td>
+          <td class="text-end fw-semibold"><%= r.marksObtained %></td>
+          <td class="text-end"><%= r.maxMarks %></td>
+          <td><span class="badge <%= r.grade === 'F' ? 'text-bg-danger' : 'text-bg-success' %>"><%= r.grade %></span></td>
+        </tr><% }) %></tbody>
+        <tfoot><tr class="table-light"><th>Total</th><th class="text-end"><%= totalMarks %></th><th class="text-end"><%= maxMarks %></th><th></th></tr></tfoot>
+      </table>
+    </div>
+    <div class="row g-3 mt-2">
+      <div class="col-md-4"><div class="card stat-card border-0 h-100"><div class="card-body text-center"><div class="stat-value"><%= percent %>%</div><div class="stat-label">Percentage</div></div></div></div>
+      <div class="col-md-4"><div class="card stat-card border-0 h-100"><div class="card-body text-center"><div class="stat-value"><%= grade %></div><div class="stat-label">Overall Grade</div></div></div></div>
+      <div class="col-md-4"><div class="card stat-card border-0 h-100"><div class="card-body text-center"><div class="stat-value text-<%= pass ? 'success' : 'danger' %>"><%= pass ? 'PASS' : 'FAIL' %></div><div class="stat-label">Result</div></div></div></div>
+    </div>
+  </div>
+</div>
+<%- include('./partials/footer') %>

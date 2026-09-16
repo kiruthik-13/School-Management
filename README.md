@@ -1,10 +1,134 @@
 # School Management System
 
-A JSP/Servlet (MVC) web application for digitizing school administration:
-admissions, students, teachers, attendance, examinations, fees, transport,
-and parent communication.
+A school administration web app for admissions, students, teachers, attendance,
+examinations, fees, transport, and parent communication.
 
-## Tech Stack
+There are two implementations in this repo:
+
+| App | Location | Stack | Status |
+|-----|----------|-------|--------|
+| **Firebase/Firestore** | `firebase/` | Node.js 20 + Express + EJS + Firestore (NoSQL) | Active, smoke-tested |
+| **Java/MySQL (legacy)** | `SchoolManagementSystem/` | JSP/Servlet + JDBC + MySQL 8 | Kept for reference |
+
+The Firebase app replaces the Java + MySQL stack with Firestore (NoSQL) and the
+Firebase emulator suite for local development.
+
+---
+
+## Firebase / Firestore app
+
+### Layout
+
+```
+firebase/
+├── firebase.json           emulator ports, functions, hosting, rules, indexes
+├── firestore.rules         security rules (dev-open; tighten for production)
+├── firestore.indexes.json  composite indexes
+├── public/                 static hosting
+└── functions/
+    ├── src/
+    │   ├── index.js        Express app + session + route mounting
+    │   ├── db.js           env-driven Firestore connection
+    │   ├── data.js         Firestore CRUD/data layer (all queries live here)
+    │   ├── util.js         CLASSES/SECTIONS/PAYMENT_MODES, hashing, counters
+    │   ├── session-store.js express-session backed by Firestore
+    │   ├── middleware.js   loadUser + requireAuth (role gate)
+    │   ├── routes/         auth, dashboard, students, teachers, subjects,
+    │   │                   exams, attendance, results, fees, transport, messages, reports
+    │   └── views/          EJS templates + partials
+    ├── seed.js             wipes + reseeds all demo data (npm run seed)
+    ├── smoke-test.js       end-to-end route/CRUD smoke test
+    └── .env.example        copy to .env with your real credentials
+```
+
+### Setup
+
+1. Install the Firebase CLI (requires Java for the emulators):
+   ```bash
+   npm i -g firebase-tools
+   ```
+2. Install dependencies and create your env file:
+   ```bash
+   cd firebase/functions
+   npm install
+   copy .env.example .env       # then fill in real values when you have them
+   cd ..
+   ```
+3. Configure `firebase/.firebaserc` with your project ID (default `demo-school`
+   runs fully in emulators without any Google credentials).
+
+### Start everything locally (no credentials needed)
+
+```bash
+cd firebase
+firebase emulators:start      # functions :5001 | hosting :5000 | auth :9099 | ui :4000
+```
+
+Open http://localhost:5000 or http://localhost:5001.
+
+### Seed the database (only the Firestore emulator needs to be running)
+
+```bash
+cd firebase
+firebase emulators:exec --only firestore "npm --prefix functions run seed"
+```
+
+Or, if the emulators are already running:
+
+```bash
+cd firebase/functions
+set FIRESTORE_EMULATOR_HOST=127.0.0.1:8085
+npm run seed
+```
+
+### Run the smoke test
+
+```bash
+cd firebase/functions
+set FIRESTORE_EMULATOR_HOST=127.0.0.1:8085
+npm test
+```
+
+The smoke test re-seeds Firestore, boots the Express app, and verifies all main
+routes + a student create/read flow return correctly.
+
+### Verify route imports
+
+```bash
+cd firebase
+node check-imports.js
+```
+
+### Demo logins (seeded by `seed.js`)
+
+| Role    | Username | Password    |
+|---------|----------|-------------|
+| Admin   | admin    | admin123    |
+| Teacher | teacher1 | teacher123  |
+| Parent  | parent1  | parent123   |
+
+### Environment variables (`firebase/functions/.env`)
+
+| Var | Required? | Notes |
+|-----|-----------|-------|
+| `FIREBASE_PROJECT_ID` | for prod | empty → uses `demo-school` emulator |
+| `GOOGLE_APPLICATION_CREDENTIALS` | for prod | path to service-account JSON |
+| `FIREBASE_EMULATOR` | optional | set `1` to force emulator mode |
+| `SESSION_SECRET` | optional | defaults to `school-demo-secret` |
+| `PORT` | optional | functions emulator uses its own port |
+
+### Data model (Firestore collections)
+
+Users, Students, Teachers, Subjects, Attendance, Exams, ExamResults, FeeStructures,
+FeePayments, TransportRoutes, StudentTransport, Messages, Sessions, Counters.
+Auto-increment IDs are maintained in the `Counters` collection so IDs stay in sync
+with the original MySQL schema.
+
+---
+
+## Java / MySQL app (legacy, kept for reference)
+
+### Tech Stack
 
 | Layer          | Technology                                   |
 |----------------|----------------------------------------------|
@@ -21,7 +145,7 @@ and parent communication.
 > the `javax.servlet.*` API (Servlet 4.0), NOT Jakarta. Do not deploy on Tomcat 10+
 > without converting imports to `jakarta.*`.
 
-## Project Layout
+### Project Layout
 
 ```
 SchoolManagementSystem/
@@ -41,9 +165,9 @@ SchoolManagementSystem/
 database/schema.sql       Full schema + seed data
 ```
 
-## Setup
+### Java app setup
 
-### 1. Create the database
+#### 1. Create the database
 
 Edit `database/schema.sql` if needed, then run:
 
@@ -55,7 +179,7 @@ mysql -u root -p -P 8090 < database/schema.sql
 re-creates the DB from scratch. Passwords are PBKDF2 hashes so `users.password`
 contains no plain text.)
 
-### 2. Configure DB credentials
+#### 2. Configure DB credentials
 
 Edit `src/main/java/com/school/util/DBConnection.java`:
 
@@ -70,7 +194,7 @@ Or override at runtime without editing code (JVM system properties):
 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`.
 E.g. deploy with `JAVA_OPTS="-DDB_PORT=3306 -DDB_PASS=secret"`.
 
-### 3. Build & run
+#### 3. Build & run
 
 **Option A - NetBeans (recommended):**
 1. File > Open Project > select the `SchoolManagementSystem` folder.
@@ -85,7 +209,7 @@ mvn tomcat7:run -Dmaven.tomcat.port=8099     # embedded quick run
 ```
 Then open http://localhost:8099/school
 
-### 4. Login
+#### 4. Login
 
 | Role    | Username | Password    |
 |---------|----------|-------------|
@@ -93,7 +217,7 @@ Then open http://localhost:8099/school
 | Teacher | teacher1 | teacher123  |
 | Parent  | parent1  | parent123   |
 
-## Modules
+### Java app modules
 
 | Module       | Admin | Teacher | Parent |
 |--------------|-------|---------|--------|
@@ -109,7 +233,7 @@ Then open http://localhost:8099/school
 
 Default passwords for auto-created accounts: parent `parent123`, teacher `teacher123`.
 
-## Notes for Extension
+### Java app notes for extension
 
 - To add PDF receipts/report cards, add `itextpdf` dependency and a report servlet.
 - BCrypt can replace `PasswordUtil` (PBKDF2-with-HMAC-SHA1) if a library is added.
@@ -120,16 +244,3 @@ Default passwords for auto-created accounts: parent `parent123`, teacher `teache
   any logged-in user for messages). Anonymous users are redirected to `/login`.
 - `exam_results` has a `UNIQUE KEY (exam_id, student_id, subject_id)` so re-saving a
   report card updates the existing row instead of inserting a duplicate.
-
-## End-to-end verification
-
-The application was built and smoke-tested against a live Tomcat + MySQL deployment:
-
-- All admin/teacher/parent pages return 200 with expected data (students, subjects,
-  exams, marks grid, report card, fees, payments, transport, reports, messages).
-- Security matrix verified: anonymous → redirect to login; wrong-role access → 403.
-- Write flows verified end-to-end (student/teacher/subject/exam/fee/payment/route/
-  assignment/message/marks POSTs all persist in MySQL).
-- Marks re-save updates the existing row (no duplicate), grades auto-computed.
-- Attendance POST saves and class-summary badges render; parent portal shows child
-  marks/dues with transport route.

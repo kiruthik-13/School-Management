@@ -1,0 +1,53 @@
+    </main>
+  </div>
+</div>
+<script>
+  (function(){
+    var root=document.documentElement;
+    var btn=document.getElementById('themeToggle');
+    var icon=document.getElementById('themeToggleIcon');
+    function sync(){ if(icon){ icon.className = root.getAttribute('data-bs-theme')==='dark' ? 'bi bi-sun' : 'bi bi-moon-stars'; } }
+    sync();
+    if(btn) btn.addEventListener('click',function(){
+      var next = root.getAttribute('data-bs-theme')==='dark' ? 'light' : 'dark';
+      root.setAttribute('data-bs-theme',next);
+      try{ localStorage.setItem('sms-theme',next); }catch(e){}
+      sync();
+    });
+  })();
+</script>
+<script>
+  (function(){
+    var el = document.getElementById('topbarClock');
+    if (!el) return;
+    var tz = '';
+    var fmt = '24';
+    try { tz = localStorage.getItem('sms-tz') || ''; } catch (e) {}
+    try { fmt = localStorage.getItem('sms-format') || '24'; } catch (e) {}
+    function tick(){
+      var d = new Date();
+      var tzOpts = tz ? { timeZone: tz } : {};
+      var hour12 = fmt === '12';
+      var props = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: hour12 };
+      var parts = new Intl.DateTimeFormat('en-GB', Object.assign({}, props, tzOpts)).formatToParts(d);
+      var map = {};
+      parts.forEach(function (p) { map[p.type] = p.value; });
+      var time = '<span class="clock-main">' + map.hour + ':' + map.minute + ':' + map.second + (hour12 ? '<span class="clock-ampm"> ' + (map.dayPeriod ? map.dayPeriod.toUpperCase() : '') + '</span>' : '') + '</span>';
+      var date = new Intl.DateTimeFormat(undefined, Object.assign({ weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }, tzOpts)).format(d);
+      var label = tz ? tz.replace(/_/g, ' ') : 'Local';
+      el.innerHTML = '<i class="bi bi-clock me-1"></i><span class="d-inline-flex flex-column">' + time + '<span class="clock-date">' + date + ' &middot; ' + label + '</span></span>';
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+<script>
+  var b=document.getElementById('sidebarToggle'), bkg=document.querySelector('[data-sidebar-close]');
+  if(b) b.addEventListener('click',function(){document.getElementById('app').classList.toggle('sidebar-open')});
+  if(bkg) bkg.addEventListener('click',function(){document.getElementById('app').classList.remove('sidebar-open')});
+  if(b) document.addEventListener('keydown',function(e){ if(e.key==='Escape') document.getElementById('app').classList.remove('sidebar-open'); });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/app.js"></script>
+</body>
+</html>
